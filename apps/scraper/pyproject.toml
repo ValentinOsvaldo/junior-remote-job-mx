@@ -1,0 +1,23 @@
+[project]
+name = "scraper"
+version = "0.1.0"
+description = "Scrapes junior/trainee dev jobs in Mexico into jobs.json"
+authors = [
+    { name = "Osvaldo Valentin", email = "ovalentindev@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "python-jobspy>=1.4.0",
+]
+
+[project.scripts]
+scrape = "scraper.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

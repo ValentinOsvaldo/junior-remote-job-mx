@@ -1,0 +1,16 @@
+{
+  "name": "junior-job",
+  "private": true,
+  "packageManager": "pnpm@11.18.0",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "scrape": "docker compose run --rm --build scraper",
+    "scrape:local": "uv run --directory apps/scraper scrape",
+    "reclassify": "docker compose run --rm --build scraper --from-cache",
+    "test": "pnpm test:scraper && pnpm test:web",
+    "test:scraper": "docker compose run --rm --build --entrypoint \"uv run --no-sync pytest -q\" scraper",
+    "test:scraper:local": "uv run --directory apps/scraper pytest -q",
+    "test:web": "pnpm --filter web test"
+  }
+}

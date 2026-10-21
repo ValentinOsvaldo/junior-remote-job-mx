@@ -1,0 +1,6 @@
+services:
+  scraper:
+    build: apps/scraper
+    volumes:
+      - ./apps/web/public/data:/out
+      - ./apps/scraper/.cache:/app/.cache # raw rows of the last scrape, for `--from-cache`
