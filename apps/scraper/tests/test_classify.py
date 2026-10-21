@@ -64,3 +64,7 @@ def test_company_key_and_english_years():
     assert seniority("Associate Software Engineer") == "junior"
     assert seniority("Software Engineer I - OXM") == "junior"
     assert seniority("Data Engineer Especialista en PySpark", job_level="Entry level") is None
+    assert seniority("ABL - Developer Angular", "desarrollo web con angular de 4 a 7 años") is None
+    assert seniority("QA Automatizado", "experiencia mínima de 4 años en roles de QA", job_level="Entry level") is None
+    assert seniority("Desarrollador Java", "mínimo 1 año de experiencia", job_level="Mid-Senior level") is None
+    assert seniority("Desarrollador Backend", "Experiencia: 0 a 1 año. Empresa con 40 años en el mercado") == "junior"

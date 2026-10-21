@@ -63,10 +63,8 @@ DESC_JUNIOR = rx(
     "sin experiencia", r"reci[eé]n egresad\w*", r"no se requiere experiencia",
     r"0 ?(?:a|-) ?1 anos?", r"1 ano de experiencia", r"menos de 1 ano", "entry level",
 )
-DESC_SENIOR_YEARS = re.compile(
-    r"(?<!\d)(?:[3-9]|1\d)\s*\+?\s*anos? (?:de )?experiencia|(?<!\d)(?:[3-9]|1\d)\s*\+\s*anos?"
-    r"|(?<!\d)(?:[3-9]|1\d)\s*\+?\s*years?(?: of)? (?:\w+ ){0,3}experience|(?<!\d)(?:[3-9]|1\d)\s*\+\s*years?"
-)
+# "3+ años", "4 a 7 años", "minimum 5 years": anything asking 3+ years is not entry level.
+DESC_SENIOR_YEARS = re.compile(r"(?<!\d)(?:[3-9]|1\d)\s*\+?\s*(?:anos?|years?)\b")
 
 
 def seniority(title: str, description: str = "", job_level: str = "") -> str | None:
@@ -80,7 +78,7 @@ def seniority(title: str, description: str = "", job_level: str = "") -> str | N
         return "trainee"
     if JUNIOR.search(t):
         return "junior"
-    if DESC_SENIOR_YEARS.search(d):
+    if DESC_SENIOR_YEARS.search(d) or "senior" in lvl:  # LinkedIn tags "Mid-Senior level"
         return None
     if "internship" in lvl:
         return "intern"
