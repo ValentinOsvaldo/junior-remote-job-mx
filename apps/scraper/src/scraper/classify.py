@@ -16,6 +16,14 @@ def company_key(company: str) -> str:
     return " ".join(w for w in re.sub(r"\W+", " ", fold(company)).split() if w not in COMPANY_NOISE)
 
 
+# Spam / mass-posting employers, matched on company_key. Add more as you find them.
+BANNED_COMPANIES = {"bairesdev"}
+
+
+def is_banned(company: str) -> bool:
+    return company_key(company) in BANNED_COMPANIES
+
+
 def fold(text: str | None) -> str:
     """Lowercase + strip accents so 'Diseño' matches 'diseno'."""
     text = unicodedata.normalize("NFKD", text or "")

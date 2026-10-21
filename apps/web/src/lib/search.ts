@@ -49,6 +49,16 @@ export function parseQuery(q: string): Clause[] {
   return clauses
 }
 
+const tokenRx = (token: string) => new RegExp(`(^|\\s)${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=\\s|$)`, 'i')
+
+export const hasToken = (q: string, token: string) => tokenRx(token).test(q)
+
+/** Adds `token` to the query, or removes it if it's already there (never duplicates). */
+export function toggleToken(q: string, token: string): string {
+  const next = hasToken(q, token) ? q.replace(tokenRx(token), ' ') : `${q} ${token}`
+  return next.replace(/\s+/g, ' ').trim()
+}
+
 /** '>15k' | '15000' | '12k-20k' -> [min, max] in MXN */
 function salaryRange(v: string): [number, number] {
   const n = (s: string) => parseFloat(s) * (/k$/.test(s) ? 1000 : 1)

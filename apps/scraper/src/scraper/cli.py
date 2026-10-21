@@ -52,6 +52,8 @@ def to_job(row: dict, now: str) -> dict | None:
         return None  # outside Mexico
     city, state = c.location(loc)
     company = row.get("company") or "Confidencial"
+    if c.is_banned(company):
+        return None
     key = f"{c.company_key(company)}|{re.sub(r'\W+', ' ', c.fold(title)).strip()}"  # same posting on several sites -> one id
     posted = row.get("date_posted")
     return {
@@ -88,7 +90,7 @@ def merge(old: list[dict], new: list[dict], now: str) -> list[dict]:
     for job in new:
         by_id[job["id"]] = combine(job, by_id[job["id"]]) if job["id"] in by_id else job
     cutoff = (datetime.fromisoformat(now) - timedelta(days=KEEP_DAYS)).date().isoformat()
-    jobs = [j for j in by_id.values() if j["postedAt"] >= cutoff]
+    jobs = [j for j in by_id.values() if j["postedAt"] >= cutoff and not c.is_banned(j["company"])]
     return sorted(jobs, key=lambda j: j["postedAt"], reverse=True)
 
 

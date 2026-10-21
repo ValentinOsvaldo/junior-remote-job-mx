@@ -1,5 +1,6 @@
 import { AnimatePresence } from 'motion/react'
 import * as m from 'motion/react-m'
+import { Button } from '@/components/ui/button'
 import { XIcon } from '../../components/ui/icons.tsx'
 import { CATEGORY_LABEL, LEVEL_LABEL, MODALITY_LABEL, SOURCE_LABEL } from '../../lib/format.ts'
 import type { Filters } from '../../lib/types.ts'
@@ -33,26 +34,32 @@ export function ActiveChips() {
     <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4 pb-3 lg:mx-0 lg:flex-wrap lg:px-0">
       <AnimatePresence mode="popLayout" initial={false}>
         {chips.map((c) => (
-          <m.button
+          <Button
             key={c.id}
-            layout
-            type="button"
-            onClick={c.remove}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.12, ease: 'easeIn' } }}
-            transition={spring}
-            whileTap={{ scale: 0.97 }}
-            className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full bg-accent/15 pl-3 pr-2 text-[13px] text-accent-ink"
-            aria-label={`Quitar filtro ${c.label}`}
+            asChild
+            size="sm"
+            className="h-8 rounded-full bg-primary/15 pl-3 pr-2 text-[13px] font-normal text-primary-ink hover:bg-primary/25"
           >
-            {c.label}
-            <XIcon width={14} height={14} />
-          </m.button>
+            <m.button
+              layout
+              onClick={c.remove}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.12, ease: 'easeIn' } }}
+              transition={spring}
+              whileTap={{ scale: 0.97 }}
+              aria-label={`Quitar filtro ${c.label}`}
+            >
+              {c.label}
+              <XIcon width={14} height={14} />
+            </m.button>
+          </Button>
         ))}
-        <m.button key="reset" layout transition={spring} type="button" onClick={reset} className="h-8 shrink-0 px-2 text-[13px] text-muted underline-offset-4 hover:text-fg hover:underline">
-          Limpiar
-        </m.button>
+        <Button key="reset" asChild variant="link" size="sm" className="h-8 px-2 text-[13px] font-normal text-muted-foreground hover:text-foreground">
+          <m.button layout transition={spring} onClick={reset}>
+            Limpiar
+          </m.button>
+        </Button>
       </AnimatePresence>
     </div>
   )

@@ -1,7 +1,7 @@
 // Run: pnpm test  (node's built-in runner, no extra deps)
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { buildIndex, parseQuery, searchJobs } from './search.ts'
+import { buildIndex, hasToken, parseQuery, searchJobs, toggleToken } from './search.ts'
 import type { Job } from './types.ts'
 
 const job = (over: Partial<Job>): Job => ({
@@ -39,4 +39,14 @@ test('searchJobs', () => {
   assert.deepEqual(run('sueldo:>16k'), ['Desarrollador Frontend Jr'])
   assert.deepEqual(run('sueldo:10k-12k'), [])
   assert.deepEqual(run('-fuente:indeed'), ['Becario Backend'])
+})
+
+test('toggleToken never duplicates', () => {
+  assert.equal(toggleToken('', 'modo:remoto'), 'modo:remoto')
+  assert.equal(toggleToken('react modo:remoto', 'modo:remoto'), 'react')
+  assert.equal(toggleToken('modo:remoto react', 'MODO:REMOTO'), 'react')
+  assert.equal(toggleToken('react', '"home office"'), 'react "home office"')
+  assert.equal(toggleToken('react "home office" x', '"home office"'), 'react x')
+  assert.equal(toggleToken('modo:remotos', 'modo:remoto'), 'modo:remotos modo:remoto') // whole tokens only
+  assert.equal(hasToken('a sueldo:>15k b', 'sueldo:>15k'), true)
 })

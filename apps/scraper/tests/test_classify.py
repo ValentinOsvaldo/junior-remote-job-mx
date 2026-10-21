@@ -68,3 +68,11 @@ def test_company_key_and_english_years():
     assert seniority("QA Automatizado", "experiencia mínima de 4 años en roles de QA", job_level="Entry level") is None
     assert seniority("Desarrollador Java", "mínimo 1 año de experiencia", job_level="Mid-Senior level") is None
     assert seniority("Desarrollador Backend", "Experiencia: 0 a 1 año. Empresa con 40 años en el mercado") == "junior"
+
+
+def test_banned_companies():
+    from scraper.classify import is_banned
+    from scraper.cli import merge
+    assert is_banned("BairesDev") and is_banned("BairesDev LLC") and not is_banned("Globant")
+    old = [{"id": "1", "company": "BairesDev", "postedAt": "2026-10-20", "firstSeen": "2026-10-20"}]
+    assert merge(old, [], "2026-10-21T00:00:00+00:00") == []

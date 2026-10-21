@@ -1,6 +1,6 @@
 // The only place the UI gets jobs from. Today: a static JSON written by the scraper,
 // filtered in the browser. With a server, replace the body of fetchJobsPage with
-// `fetch('/api/jobs?' + params)`; the page shape stays the same.
+// `fetch('/api/jobs?' + params)` (and fetchJob with `/api/jobs/:id`); the shapes stay the same.
 import { buildIndex, searchJobs } from './search.ts'
 import type { FacetKey, Facets, Filters, Job, JobsFile, JobsPage, JobsQuery } from './types.ts'
 
@@ -8,6 +8,7 @@ export const PAGE_SIZE = 30
 const DAY = 86_400_000
 
 let data: Promise<JobsFile & { index: ReturnType<typeof buildIndex> }> | null = null
+let byId: Map<string, Job> | null = null // filled once loaded, for synchronous lookups
 
 function load() {
   data ??= fetch(`${import.meta.env.BASE_URL}data/jobs.json`)
@@ -15,13 +16,25 @@ function load() {
       if (!r.ok) throw new Error(r.status === 404 ? 'No hay datos todavía. Ejecuta `pnpm scrape`.' : `HTTP ${r.status}`)
       return r.json() as Promise<JobsFile>
     })
-    .then((file) => ({ ...file, index: buildIndex(file.jobs) }))
+    .then((file) => {
+      byId = new Map(file.jobs.map((j) => [j.id, j]))
+      return { ...file, index: buildIndex(file.jobs) }
+    })
     .catch((e) => {
       data = null // allow retry
       throw e
     })
   return data
 }
+
+/** null when the job is gone (expired postings are dropped by the scraper after 30 days). */
+export async function fetchJob(id: string): Promise<Job | null> {
+  await load()
+  return byId!.get(id) ?? null
+}
+
+/** Sync lookup when the data is already loaded (coming from the list): lets the page render in the same frame. */
+export const peekJob = (id: string) => byId?.get(id)
 
 const FACET_VALUE: Record<FacetKey, (j: Job) => string[]> = {
   levels: (j) => [j.level],

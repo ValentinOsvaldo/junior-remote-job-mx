@@ -47,7 +47,10 @@ function toUrl({ q, sort, filters: f }: State) {
   if (f.days) p.set('days', String(f.days))
   if (f.savedOnly) p.set('saved', '')
   const search = p.toString().replace(/=(&|$)/g, '$1')
-  history.replaceState(null, '', search ? `?${search}` : location.pathname)
+  // Keep history.state: React Router stores its location key there (scroll restoration, back).
+  // ponytail: bypasses the router (its location.search lags until the next navigation); move filters to
+  // useSearchParams if a route ever needs to read them.
+  history.replaceState(history.state, '', search ? `?${search}` : location.pathname)
 }
 
 // --- Saved jobs (per browser) ----------------------------------------------------

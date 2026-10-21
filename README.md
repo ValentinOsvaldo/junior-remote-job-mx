@@ -26,6 +26,7 @@ apps/scraper/   Python (uv). cli.py = fetch + merge + write, classify.py = all f
 apps/web/       Vite + React 19 + Tailwind v4
   src/lib/jobs-source.ts   the only data access point (static JSON today)
   src/lib/search.ts        query parser + MiniSearch index
+  src/routes.tsx           React Router routes: `/` (list) and `/job/:id` (detail); router in main.tsx
   src/store/filters.ts     zustand, synced to the URL
   src/components/ui/       design-system primitives
   src/features/jobs/       list, card, filters, search

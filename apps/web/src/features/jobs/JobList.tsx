@@ -1,7 +1,7 @@
 import { useWindowVirtualizer } from '@tanstack/react-virtual'
 import * as m from 'motion/react-m'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Button } from '../../components/ui/button.tsx'
+import { Button } from '@/components/ui/button'
 import { useStore } from '../../store/filters.ts'
 import { JobCard } from './JobCard.tsx'
 import type { useJobs } from './use-jobs.ts'
@@ -53,7 +53,11 @@ export function JobList({ query }: { query: ReturnType<typeof useJobs> }) {
     lastFirstPage.current = firstPage
     seen.current = new Set()
   }
+  const scrolledFor = useRef(firstPage)
   useEffect(() => {
+    // Effects re-run when <Activity> shows the list again; only a *new* result set should scroll.
+    if (scrolledFor.current === firstPage) return
+    scrolledFor.current = firstPage
     if (window.scrollY > topRef.current) window.scrollTo({ top: Math.max(0, topRef.current - 160) })
   }, [firstPage])
   useEffect(() => {
@@ -63,21 +67,21 @@ export function JobList({ query }: { query: ReturnType<typeof useJobs> }) {
   if (error) {
     return (
       <State title="No se pudieron cargar las vacantes" body={error.message}>
-        <Button onClick={() => refetch()}>Reintentar</Button>
+        <Button variant="outline" onClick={() => refetch()}>Reintentar</Button>
       </State>
     )
   }
   if (isPending) {
     return (
       <div className="space-y-3" aria-busy="true" aria-label="Cargando vacantes">
-        {[0, 1, 2, 3].map((i) => <div key={i} className="h-52 animate-pulse rounded-2xl bg-surface" />)}
+        {[0, 1, 2, 3].map((i) => <div key={i} className="h-52 animate-pulse rounded-2xl bg-card" />)}
       </div>
     )
   }
   if (!jobs.length) {
     return (
       <State title="Sin resultados" body="Prueba con menos filtros o una búsqueda más corta.">
-        <Button onClick={reset}>Limpiar filtros</Button>
+        <Button variant="outline" onClick={reset}>Limpiar filtros</Button>
       </State>
     )
   }
@@ -107,7 +111,7 @@ export function JobList({ query }: { query: ReturnType<typeof useJobs> }) {
                 <JobCard job={job} saved={savedSet.has(job.id)} onToggleSave={toggleSaved} />
               </m.div>
             ) : (
-              <p className="py-6 text-center font-mono text-xs text-muted" role="status">Cargando más…</p>
+              <p className="py-6 text-center font-mono text-xs text-muted-foreground" role="status">Cargando más…</p>
             )}
           </div>
         )
@@ -118,9 +122,9 @@ export function JobList({ query }: { query: ReturnType<typeof useJobs> }) {
 
 function State({ title, body, children }: { title: string; body: string; children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-dashed border-line px-6 py-14 text-center">
+    <div className="rounded-2xl border border-dashed border-border px-6 py-14 text-center">
       <p className="text-lg font-semibold">{title}</p>
-      <p className="mx-auto mt-1 max-w-sm text-sm text-muted">{body}</p>
+      <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{body}</p>
       <div className="mt-5">{children}</div>
     </div>
   )
